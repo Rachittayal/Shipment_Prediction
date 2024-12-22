@@ -1,0 +1,70 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delay Prediction</title>
+    <script>
+        async function predict() {
+            const data = {
+                "Origin": document.getElementById("origin").value,
+                "Destination": document.getElementById("destination").value,
+                "Vehicle Type": document.getElementById("vehicleType").value,
+                "Weather Conditions": document.getElementById("weather").value,
+                "Traffic Conditions": document.getElementById("traffic").value,
+                "Shipment_Duration": parseInt(document.getElementById("shipmentDuration").value),
+                "Actual_Duration": parseInt(document.getElementById("actualDuration").value)
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                document.getElementById("result").innerText = `Delayed: ${result.Delayed}`;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById("result").innerText = 'Error occurred while predicting.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Delay Prediction</h1>
+    <form onsubmit="event.preventDefault(); predict();">
+        <label for="origin">Origin:</label>
+        <input type="text" id="origin" required><br><br>
+
+        <label for="destination">Destination:</label>
+        <input type="text" id="destination" required><br><br>
+
+        <label for="vehicleType">Vehicle Type:</label>
+        <input type="text" id="vehicleType" required><br><br>
+
+        <label for="weather">Weather Conditions:</label>
+        <input type="text" id="weather" required><br><br>
+
+        <label for="traffic">Traffic Conditions:</label>
+        <input type="text" id="traffic" required><br><br>
+
+        <label for="shipmentDuration">Shipment Duration (days):</label>
+        <input type="number" id="shipmentDuration" required><br><br>
+
+        <label for="actualDuration">Actual Duration (days):</label>
+        <input type="number" id="actualDuration" required><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <h2 id="result"></h2>
+</body>
+</html>
